@@ -10,6 +10,11 @@ env_remote_dir="/root/githubsync/"
 env_local_dir="$workdir/download_store/"
 
 prepare_cmd(){
+    echo "设置时区"
+    timedatectl;date
+    timedatectl set-timezone Asia/Shanghai
+    timedatectl;date
+
     type jq
     if [ $? -ne 0 ];then
         yum install -y epel-release
