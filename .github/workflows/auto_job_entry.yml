@@ -1,36 +1,69 @@
-# This is a basic workflow to help you get started with Actions
+name: 自动更新文件到PC
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  schedule:
+    # 每天22:05运行,中国时区每天06:05运行
+    - cron: '5 22 */1 * *'
+
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  # Inputs the workflow accepts.
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  contents: read
+
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    environment: push_to_pc
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: 检测触发事件
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo 触发事件:$GITHUB_EVENT_NAME
+
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          # Repository name with owner. For example, actions/checkout
+          repository: ${{ github.repository }}
+
+      # 不好使， 没法支持ipv6 ?!
+      #- name: Set up WARP
+      #  uses: fscarmen/warp-on-actions@v1.3
+      #  with:
+      #    stack: dual        # Optional. Support [ ipv4, ipv6, dual ]. Default is dual.
+      #    mode: wireguard    # Optional. Support [ wireguard, client ]. Default is wireguard.
+
+      # 2 Build and push image to ACR
+      - name: run_shell_entry
+        env: # Or as an environment variable
+          super_secret: ${{ secrets.RSA_PRIVATE_KEY_ALI }}
+          env_ip: ${{ secrets.ENV_IP_ALI }}
+          env_user: ${{ secrets.ENV_USER_ALI }}
+        run: |
+          echo "--------------list ip addr"
+          ip addr
+          echo "--------------show pwd"
+          pwd
+          echo "--------------do env"
+          sed -i "s/env_user.*/env_user=$env_user/g" secret.env
+          sed -i "s/env_ip.*/env_ip=$env_ip/g" secret.env
+          #cat secret.env
+          echo "--------------test ipv6"
+          #ping -6 -c 4 www.baidu.com
+          # 机密
+          echo "--------------do id_rsa"
+          echo "$super_secret" > id_rsa
+          echo "--------------list file"
+          ls -l
+          #find .
+          echo "--------------run shell"
+          bash  ./run_shell_entry.sh
+          echo "--------------clean id_rsa"
+          rm -rf id_rsa
+          echo "--------------end of all"
+          
