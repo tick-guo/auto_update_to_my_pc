@@ -11,9 +11,8 @@ env_local_dir="$workdir/download_store/"
 
 prepare_cmd(){
     echo "设置时区"
-    timedatectl;date
-    timedatectl set-timezone Asia/Shanghai
-    timedatectl;date
+    date
+    export TZ='Asia/Shanghai';date
 
     type jq
     if [ $? -ne 0 ];then
