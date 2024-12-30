@@ -30,7 +30,7 @@ update_file_use_rsync(){
     echo "$(date +%F_%T)" > "$env_local_dir/update_date.log"
     cd "$env_local_dir" || echo cd failed
     ls -lhR > updatefilelist.log
-    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file=id_rsa
+    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$workdir/id_rsa"
     echo ret=$?
     cd "$workdir" || echo cd failed
 }
