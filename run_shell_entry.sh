@@ -24,6 +24,17 @@ prepare_cmd(){
 
 #https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases-for-a-repository
 
+update_file_use_rsync(){
+    echo "push $env_local_dir"
+    chmod 600 id_rsa
+    echo "$(date +%F_%T)" > "$env_local_dir/update_date.log"
+    cd "$env_local_dir" || echo cd failed
+    ls -lhR > updatefilelist.log
+    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file=id_rsa
+    echo ret=$?
+    cd "$workdir" || echo cd failed
+}
+
 update_file_tool(){
     echo "push $env_local_dir"
     chmod 600 id_rsa
@@ -69,7 +80,8 @@ do_main(){
     echo "list files"
     find "$env_local_dir"
     echo "send all file"
-    update_file_tool
+    #update_file_tool
+    update_file_use_rsync
 }
 
 do_main

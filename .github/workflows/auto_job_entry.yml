@@ -41,7 +41,8 @@ jobs:
       # 2 Build and push image to ACR
       - name: run_shell_entry
         env: # Or as an environment variable
-          super_secret: ${{ secrets.RSA_PRIVATE_KEY_ALI }}
+          #super_secret: ${{ secrets.RSA_PRIVATE_KEY_ALI }}
+          super_secret: ${{ secrets.RSYNC_KEY }}
           env_ip: ${{ secrets.ENV_IP_ALI }}
           env_user: ${{ secrets.ENV_USER_ALI }}
         run: |
