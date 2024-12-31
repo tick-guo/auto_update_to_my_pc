@@ -46,15 +46,15 @@ jobs:
           env_ip: ${{ secrets.ENV_IP_ALI }}
           env_user: ${{ secrets.ENV_USER_ALI }}
         run: |
-          echo "--------------list ip addr"
-          ip addr
+          #echo "--------------list ip addr"
+          #ip addr
           echo "--------------show pwd"
           pwd
           echo "--------------do env"
           sed -i "s/env_user.*/env_user=$env_user/g" secret.env
           sed -i "s/env_ip.*/env_ip=$env_ip/g" secret.env
           #cat secret.env
-          echo "--------------test ipv6"
+          #echo "--------------test ipv6"
           #ping -6 -c 4 www.baidu.com
           # 机密
           echo "--------------do id_rsa"

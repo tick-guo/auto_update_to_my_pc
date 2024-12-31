@@ -2,7 +2,6 @@
 cd "$(dirname $0)" || exit 1
 workdir="$(pwd)"
 
-
 source ./secret.env
 
 #env_remote_dir="/e:/githubsync/"
@@ -12,26 +11,35 @@ env_local_dir="$workdir/download_store/"
 prepare_cmd(){
     echo "设置时区"
     date
-    export TZ='Asia/Shanghai';date
+    export TZ='Asia/Shanghai'
+    date
 
     type jq
     if [ $? -ne 0 ];then
         yum install -y epel-release
         yum install -y jq
     fi
+    echo "测试ping ipv6"
     ping -6 -c 2 www.baidu.com
 }
 
 #https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases-for-a-repository
 
 update_file_use_rsync(){
-    echo "push $env_local_dir"
-    chmod 600 id_rsa
-    echo "$(date +%F_%T)" > "$env_local_dir/update_date.log"
+    echo "推送 $env_local_dir"
     cd "$env_local_dir" || echo cd failed
+    chmod 600 id_rsa
+    # 把就日志拉下来
+    rsync -vz -rlptD -P   rsync1@$env_ip::rsync-data/update_date.log ./update_date.log.old  --password-file="$workdir/id_rsa"
+    echo "$(date +%F_%T)" > "update_date.log"
+    cat update_date.log.old >> update_date.log
+    rm -rf update_date.log.old
+    #
     ls -lhR > updatefilelist.log
-    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$workdir/id_rsa"
+    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$workdir/id_rsa" | tee -a "$env_local_dir/updatefilelist.log"
     echo ret=$?
+    # 再把日志单独推送一次
+    rsync -vz -rlptD -P ./updatefilelist.log  rsync1@$env_ip::rsync-data --password-file="$workdir/id_rsa"
     cd "$workdir" || echo cd failed
 }
 
