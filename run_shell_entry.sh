@@ -1,21 +1,27 @@
 #!/bin/bash
 cd "$(dirname $0)" || exit 1
-workdir="$(pwd)"
+bashdir="$(pwd)"
 
-source ./secret.env
-
-#env_remote_dir="/e:/githubsync/"
-env_remote_dir="/root/githubsync/"
-env_local_dir="$workdir/download_store/"
+upload_dir="$bashdir/download_store/"
+keyfile="$bashdir/sync-passwd"
 
 prepare_cmd(){
+    echo "准备阶段"
+    echo pwd=$(pwd)
+    # 机密
+    echo "$super_secret" > $keyfile
+    chmod 600 $keyfile
+    #
+    echo "列举文件"
+    ls -l
+    #
     echo "设置时区"
     date
     export TZ='Asia/Shanghai'
     date
-
+    #
     echo env_yml=$env_yml
-
+    #
     type jq
     if [ $? -ne 0 ];then
         yum install -y epel-release
@@ -28,33 +34,33 @@ prepare_cmd(){
 #https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases-for-a-repository
 
 update_file_use_rsync(){
-    echo "推送 $env_local_dir"
-    cd "$env_local_dir" || echo cd failed
-    chmod 600 id_rsa
+    echo "推送 $upload_dir"
+    cd "$upload_dir" || echo cd failed
     # 把就日志拉下来
-    rsync -vz -rlptD -P   rsync1@$env_ip::rsync-data/update_date.log ./update_date.log.old  --password-file="$workdir/id_rsa"
+    rsync -vz -rlptD -P   rsync1@$env_ip::rsync-data/update_date.log ./update_date.log.old  --password-file="$keyfile"
     echo "$(date +%F_%T)" > "update_date.log"
     cat update_date.log.old >> update_date.log
     rm -rf update_date.log.old
     #
     ls -lhR > updatefilelist.log
-    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$workdir/id_rsa" | tee -a "$env_local_dir/updatefilelist.log"
+    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$keyfile" | tee -a "$upload_dir/updatefilelist.log"
     echo ret=$?
     # 再把日志单独推送一次
-    rsync -vz -rlptD -P ./updatefilelist.log  rsync1@$env_ip::rsync-data --password-file="$workdir/id_rsa"
-    cd "$workdir" || echo cd failed
+    rsync -vz -rlptD -P ./updatefilelist.log  rsync1@$env_ip::rsync-data --password-file="$keyfile"
+    cd "$bashdir" || echo cd failed
 }
 
-update_file_tool(){
-    echo "push $env_local_dir"
+update_file_tool_ssh(){
+    echo "push $upload_dir"
     chmod 600 id_rsa
-    echo $(date) > "$env_local_dir/date.log"
+    echo $(date) > "$upload_dir/date.log"
     ssh -i id_rsa -o StrictHostKeyChecking=no "$env_user@$env_ip" "pwd"
-    scp -i id_rsa  -P "$env_port" -r  "$env_local_dir" "$env_user@$env_ip:$env_remote_dir"
+    scp -i id_rsa  -P "$env_port" -r  "$upload_dir" "$env_user@$env_ip:/root/xxx/"
 }
 
 update_legado(){
-    legado="$env_local_dir/legado"
+    cd "$bashdir"
+    legado="$upload_dir/legado"
     mkdir -p "$legado"
 
     curl -s https://api.github.com/repos/gedoor/legado/releases?per_page=1 > 1.log
@@ -78,8 +84,10 @@ update_legado(){
 
     done
 
+}
 
-
+end_clean_file(){
+    rm -rf $keyfile
 }
 
 do_main(){
@@ -88,12 +96,13 @@ do_main(){
     echo "download local files"
     update_legado
     echo "list files"
-    find "$env_local_dir"
+    find "$upload_dir"
     echo "send all file"
     #update_file_tool
     update_file_use_rsync
+    #
+    end_clean_file
 }
 
 do_main
 echo "----eof----"
-
