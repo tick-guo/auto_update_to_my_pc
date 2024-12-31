@@ -14,6 +14,8 @@ prepare_cmd(){
     export TZ='Asia/Shanghai'
     date
 
+    echo env_yml=$env_yml
+
     type jq
     if [ $? -ne 0 ];then
         yum install -y epel-release

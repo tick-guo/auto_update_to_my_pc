@@ -45,6 +45,7 @@ jobs:
           super_secret: ${{ secrets.RSYNC_KEY }}
           env_ip: ${{ secrets.ENV_IP_ALI }}
           env_user: ${{ secrets.ENV_USER_ALI }}
+          env_yml: "can see in bash"
         run: |
           #echo "--------------list ip addr"
           #ip addr
