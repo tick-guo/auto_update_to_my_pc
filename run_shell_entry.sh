@@ -7,7 +7,7 @@ keyfile="$bashdir/sync-passwd"
 
 prepare_cmd(){
     echo "准备阶段"
-    echo pwd=$(pwd)
+    echo cur_dir=$(pwd)
     # 机密
     echo "$super_secret" > $keyfile
     chmod 600 $keyfile
