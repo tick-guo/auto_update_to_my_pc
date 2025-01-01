@@ -228,19 +228,19 @@ run_zerotier_docker(){
     docker images
     sleep 5
     docker-compose logs zerotier
-    docker inspect zerotier
+    #docker inspect zerotier
 
-    echo 容器内部
-    docker exec zerotier ip addr
-    docker exec zerotier ping -c 2 8.8.8.8
-    docker exec zerotier ping -c 2 www.baidu.com
-    docker exec zerotier ping -c 2 tb4.fun60.fun
-    docker exec zerotier curl -v tb4.fun60.fun:22
+    #echo 容器内部
+    #docker exec zerotier ip addr
+    #docker exec zerotier ping -c 2 8.8.8.8
+    #docker exec zerotier ping -c 2 www.baidu.com
+    #docker exec zerotier ping -c 2 tb4.fun60.fun
+    #docker exec zerotier curl -v tb4.fun60.fun:22
     echo 容器外部
     ip addr
-    ping -c 2 8.8.8.8
+    #ping -c 2 8.8.8.8
     ping -c 2 www.baidu.com
-    ping -c 2 tb4.fun60.fun
+    #ping -c 2 tb4.fun60.fun
     curl -v tb4.fun60.fun:22
 
 
