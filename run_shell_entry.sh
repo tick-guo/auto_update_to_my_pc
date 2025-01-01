@@ -6,6 +6,8 @@ upload_dir="$bashdir/download_store/"
 keyfile="$bashdir/sync-passwd"
 
 prepare_cmd(){
+    echo "系统版本"
+    cat /etc/os-release
     echo "准备阶段"
     echo cur_dir=$(pwd)
     # 机密
