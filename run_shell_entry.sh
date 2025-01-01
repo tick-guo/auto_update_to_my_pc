@@ -64,6 +64,8 @@ update_file_tool_ssh(){
     chmod 600 "$bashdir/pc-key"
     #
     cd "$upload_dir" || echo cd failed
+    #test
+    ssh -o StrictHostKeyChecking=no -i $pckey $PC_USER@$PC_IP  'cd'
     # 把就日志拉下来
     rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/update_date.log ./update_date.log.old
     echo "$(date +%F_%T)" > "update_date.log"
