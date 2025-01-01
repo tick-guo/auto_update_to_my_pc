@@ -77,6 +77,7 @@ update_file_tool_ssh(){
     echo ret=$?
     # 再把日志单独推送一次
     rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P ./updatefilelist.log  $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/
+    ssh  -i $pckey $PC_USER@$PC_IP  ' icacls  E:\githubsync\datapc /reset /t  > nul '
     cd "$bashdir" || echo cd failed
 
 }
