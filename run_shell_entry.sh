@@ -11,7 +11,7 @@ prepare_cmd(){
     echo "准备阶段"
     echo cur_dir=$(pwd)
     # 机密
-    echo "$super_secret" > $keyfile
+    echo "$RSYNC_KEY" > $keyfile
     chmod 600 $keyfile
     #
     echo "列举文件"
@@ -29,6 +29,8 @@ prepare_cmd(){
         yum install -y epel-release
         yum install -y jq
     fi
+    echo "测试ping ipv4"
+    ping -4 -c 2 www.baidu.com
     echo "测试ping ipv6"
     ping -6 -c 2 www.baidu.com
 }
@@ -36,7 +38,7 @@ prepare_cmd(){
 #https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases-for-a-repository
 
 update_file_use_rsync(){
-    echo "推送 $upload_dir"
+    echo "推送ALI $upload_dir"
     cd "$upload_dir" || echo cd failed
     # 把就日志拉下来
     rsync -vz -rlptD -P   rsync1@$env_ip::rsync-data/update_date.log ./update_date.log.old  --password-file="$keyfile"
@@ -53,11 +55,28 @@ update_file_use_rsync(){
 }
 
 update_file_tool_ssh(){
-    echo "push $upload_dir"
-    chmod 600 id_rsa
-    echo $(date) > "$upload_dir/date.log"
-    ssh -i id_rsa -o StrictHostKeyChecking=no "$env_user@$env_ip" "pwd"
-    scp -i id_rsa  -P "$env_port" -r  "$upload_dir" "$env_user@$env_ip:/root/xxx/"
+    echo "推送PC $upload_dir"
+    cd $bashdir
+    pckey="$bashdir/pc-key"
+    echo $PC_KEY > "$bashdir/pc-key"
+    sudo apt install dos2unix -y
+    dos2unix "$bashdir/pc-key"
+    chmod 600 "$bashdir/pc-key"
+    #
+    cd "$upload_dir" || echo cd failed
+    # 把就日志拉下来
+    rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/update_date.log ./update_date.log.old
+    echo "$(date +%F_%T)" > "update_date.log"
+    cat update_date.log.old >> update_date.log
+    rm -rf update_date.log.old
+    #
+    ls -lhR > updatefilelist.log
+    rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P ./  $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/ | tee -a "$upload_dir/updatefilelist.log"
+    echo ret=$?
+    # 再把日志单独推送一次
+    rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P ./updatefilelist.log  $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/
+    cd "$bashdir" || echo cd failed
+
 }
 
 update_legado(){
@@ -188,6 +207,44 @@ update_ImageGlass(){
 
 }
 
+run_zerotier_docker(){
+    mkdir -p $bashdir/zerotier
+    cd $bashdir/zerotier
+    #
+    curl -L "https://github.com/docker/compose/releases/download/v2.32.1/docker-compose-$(uname -s)-$(uname -m)" -o  docker-compose
+    chmod 755  docker-compose
+    #cp docker-compose /usr/bin/docker-compose
+    PATH=$(pwd):$PATH
+    ls -la
+    #
+    mkdir data
+    echo > .env
+    echo NETWORK_ID=$NETWORK_ID > .env
+    echo ZEROTIER_API_SECRET=$ZEROTIER_API_SECRET > .env
+    echo ZEROTIER_IDENTITY_PUBLIC=$ZEROTIER_IDENTITY_PUBLIC > .env
+    echo ZEROTIER_IDENTITY_SECRET=$ZEROTIER_IDENTITY_SECRET > .env
+
+    docker-compose up -d
+    docker images
+    sleep 5
+    docker-compose logs zerotier
+    docker inspect zerotier
+
+    echo 容器内部
+    docker exec zerotier ip addr
+    docker exec zerotier ping -c 2 8.8.8.8
+    docker exec zerotier ping -c 2 www.baidu.com
+    docker exec zerotier ping -c 2 tb4.fun60.fun
+    docker exec zerotier curl -v tb4.fun60.fun:22
+    echo 容器外部
+    ip addr
+    ping -c 2 8.8.8.8
+    ping -c 2 www.baidu.com
+    ping -c 2 tb4.fun60.fun
+    curl -v tb4.fun60.fun:22
+
+
+}
 
 end_clean_file(){
     rm -rf $keyfile
@@ -204,9 +261,13 @@ do_main(){
 
     echo "list files"
     find "$upload_dir"
+    #
+    run_zerotier_docker
+    #
     echo "send all file"
     #update_file_tool
     update_file_use_rsync
+    update_file_tool_ssh
     #
     end_clean_file
 }

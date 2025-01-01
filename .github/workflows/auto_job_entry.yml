@@ -43,10 +43,18 @@ jobs:
       - name: run_shell_entry
         env: # Or as an environment variable
           #super_secret: ${{ secrets.RSA_PRIVATE_KEY_ALI }}
-          super_secret: ${{ secrets.RSYNC_KEY }}
+          RSYNC_KEY: ${{ secrets.RSYNC_KEY }}
           env_ip: ${{ secrets.ENV_IP_ALI }}
           env_user: ${{ secrets.ENV_USER_ALI }}
           env_yml: "can see in bash"
+          NETWORK_ID: ${{ secrets.NETWORK_ID }}
+          ZEROTIER_API_SECRET: ${{ secrets.ZEROTIER_API_SECRET }}
+          ZEROTIER_IDENTITY_PUBLIC: ${{ secrets.ZEROTIER_IDENTITY_PUBLIC }}
+          ZEROTIER_IDENTITY_SECRET: ${{ secrets.ZEROTIER_IDENTITY_SECRET }}
+          #
+          PC_USER: ${{ secrets.PC_USER }}
+          PC_IP: ${{ secrets.PC_IP }}
+          PC_KEY: ${{ secrets.PC_KEY }}
         run: |
           echo "--------------start"
           bash ./run_shell_entry.sh
