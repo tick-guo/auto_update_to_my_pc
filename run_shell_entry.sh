@@ -58,9 +58,9 @@ update_file_tool_ssh(){
     echo "推送PC $upload_dir"
     cd $bashdir
     pckey="$bashdir/pc-key"
-    echo $PC_KEY > "$bashdir/pc-key"
-    sudo apt install dos2unix -y
-    dos2unix "$bashdir/pc-key"
+    echo "$PC_KEY" > "$bashdir/pc-key"
+    #sudo apt install dos2unix -y
+    #dos2unix "$bashdir/pc-key"
     chmod 600 "$bashdir/pc-key"
     #
     cd "$upload_dir" || echo cd failed
