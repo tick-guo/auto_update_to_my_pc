@@ -29,8 +29,8 @@ prepare_cmd(){
         yum install -y epel-release
         yum install -y jq
     fi
-    echo "测试ping ipv4"
-    ping -4 -c 2 www.baidu.com
+    #echo "测试ping ipv4"
+    #ping -4 -c 2 www.baidu.com
     echo "测试ping ipv6"
     ping -6 -c 2 www.baidu.com
 }
@@ -54,6 +54,7 @@ update_file_use_rsync(){
     cd "$bashdir" || echo cd failed
 }
 
+# rsync through ssh
 update_file_tool_ssh(){
     echo "推送PC $upload_dir"
     cd $bashdir
@@ -80,6 +81,45 @@ update_file_tool_ssh(){
     ssh  -i $pckey $PC_USER@$PC_IP  ' icacls  E:\githubsync\datapc /reset /t  > nul '
     cd "$bashdir" || echo cd failed
 
+}
+
+
+# windows rsync daemon
+update_file_rsync_to_pc(){
+    ip=$PC_IP
+    echo "推送ALI $upload_dir"
+    cd "$upload_dir" || echo cd failed
+    # test internet
+    cnt=0
+    while true;
+    do
+        rsync   --list-only    rsync1@$ip::rsync-data    /tmp/ --password-file="$keyfile"
+        if [ $? -eq 0 ];then
+            echo connect is ok
+            break
+        else
+            echo wait serotier is ok
+            sleep 1
+        fi
+        echo test cnt=$((cnt++))
+        if [ "$cnt" -gt "10" ];then
+            echo connection is timeout
+            return 1
+        fi
+    done
+
+    # 把就日志拉下来
+    rsync -vz -rlptD -P   rsync1@$ip::rsync-data/update_date.log ./update_date.log.old  --password-file="$keyfile"
+    echo "$(date +%F_%T)" > "update_date.log"
+    cat update_date.log.old >> update_date.log
+    rm -rf update_date.log.old
+    #
+    ls -lhR > updatefilelist.log
+    rsync -vz -rlptD -P ./  rsync1@$ip::rsync-data --password-file="$keyfile" | tee -a "$upload_dir/updatefilelist.log"
+    echo ret=$?
+    # 再把日志单独推送一次
+    rsync -vz -rlptD -P ./updatefilelist.log  rsync1@$ip::rsync-data --password-file="$keyfile"
+    cd "$bashdir" || echo cd failed
 }
 
 update_legado(){
@@ -229,7 +269,7 @@ run_zerotier_docker(){
 
     docker-compose up -d
     docker images
-    sleep 5
+    #sleep 5
     docker-compose logs zerotier
     #docker inspect zerotier
 
@@ -242,9 +282,9 @@ run_zerotier_docker(){
     echo 容器外部
     ip addr
     #ping -c 2 8.8.8.8
-    ping -c 2 www.baidu.com
+    #ping -c 2 www.baidu.com
     #ping -c 2 tb4.fun60.fun
-    curl -v tb4.fun60.fun:22
+    #curl -v tb4.fun60.fun:22
 
 
 }
@@ -270,7 +310,8 @@ do_main(){
     echo "send all file"
     #update_file_tool
     update_file_use_rsync
-    update_file_tool_ssh
+    #update_file_tool_ssh
+    update_file_rsync_to_pc
     #
     end_clean_file
 }
