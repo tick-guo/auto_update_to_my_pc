@@ -87,7 +87,7 @@ update_file_tool_ssh(){
 # windows rsync daemon
 update_file_rsync_to_pc(){
     ip=$PC_IP
-    echo "推送ALI $upload_dir"
+    echo "推送PC $upload_dir"
     cd "$upload_dir" || echo cd failed
     # test internet
     cnt=0
@@ -98,7 +98,7 @@ update_file_rsync_to_pc(){
             echo connect is ok
             break
         else
-            echo wait serotier is ok
+            echo zerotier is not ok, wait ...
             sleep 1
         fi
         echo test cnt=$((cnt++))
