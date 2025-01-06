@@ -7,7 +7,8 @@
 services:
   zerotier:
     #image: registry.cn-chengdu.aliyuncs.com/tickg/zerotier-zerotier:1.14.0
-    image: zerotier/zerotier:1.14.0
+    #image: zerotier/zerotier:1.14.0
+    image: zerotier/zerotier:latest
     network_mode: host
     container_name: zerotier
     restart: unless-stopped
