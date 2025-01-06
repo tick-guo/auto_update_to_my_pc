@@ -294,23 +294,26 @@ end_clean_file(){
 }
 
 do_main(){
-    echo "prepare cmd"
+    echo "准备命令环境"
     prepare_cmd
-    echo "download local files"
+    echo "先运行docker以便异步准备网络"
+    run_zerotier_docker
+    #
+    echo "下载文件"
     update_legado
     update_notepadpp
     update_moonlight
     update_ImageGlass
-
-    echo "list files"
+    #
+    echo "列举文件"
     find "$upload_dir"
     #
-    run_zerotier_docker
-    #
-    echo "send all file"
+    echo "发送文件到云服务器"
     #update_file_tool
     update_file_use_rsync
+    # 通过ssh通道发送，不再使用
     #update_file_tool_ssh
+    echo "发送文件到PC"
     update_file_rsync_to_pc
     #
     end_clean_file
