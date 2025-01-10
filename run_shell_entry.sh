@@ -89,6 +89,8 @@ update_file_rsync_to_pc(){
     ip=$PC_IP
     echo "推送PC $upload_dir"
     cd "$upload_dir" || echo cd failed
+    echo "统计数据大小"
+    du -sh "$(pwd)"
     # test internet
     cnt=0
     while true;
