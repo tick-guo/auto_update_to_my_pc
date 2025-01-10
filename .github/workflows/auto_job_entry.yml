@@ -3,7 +3,7 @@ name: 自动更新文件到PC
 on:
   schedule:
     # 每天22:05运行,中国时区每天06:05运行
-    - cron: '10 6,14,22 */1 * *'
+    - cron: '10 */2 */1 * *'
 
   push:
     branches:
@@ -39,7 +39,17 @@ jobs:
       #    stack: dual        # Optional. Support [ ipv4, ipv6, dual ]. Default is dual.
       #    mode: wireguard    # Optional. Support [ wireguard, client ]. Default is wireguard.
 
-      # 2 Build and push image to ACR
+      - name: Cache
+        uses: actions/cache@v4.2.0
+        with:
+          # A list of files, directories, and wildcard patterns to cache and restore
+          path: 'action-cache'
+          # An explicit key for restoring and saving the cache
+          key: ${{ runner.os }}-action-cache
+          # Run the post step to save the cache even if another step before fails
+          #save-always: # optional, default is false
+
+          
       - name: run_shell_entry
         env: # Or as an environment variable
           #super_secret: ${{ secrets.RSA_PRIVATE_KEY_ALI }}
