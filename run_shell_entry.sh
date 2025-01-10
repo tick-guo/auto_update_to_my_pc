@@ -254,10 +254,7 @@ run_zerotier_docker(){
     mkdir -p $bashdir/zerotier
     cd $bashdir/zerotier
     #
-    curl -L "https://github.com/docker/compose/releases/download/v2.32.1/docker-compose-$(uname -s)-$(uname -m)" -o  docker-compose
-    chmod 755  docker-compose
-    #cp docker-compose /usr/bin/docker-compose
-    PATH=$(pwd):$PATH
+
     ls -la
     #
     mkdir data
@@ -293,9 +290,27 @@ end_clean_file(){
     rm -rf $keyfile
 }
 
+do_action-cache(){
+    cd "$bashdir"
+    mkdir action-cache
+    cd "action-cache"
+    # 设置到环境变量
+    PATH=$(pwd):$PATH
+    if [ ! -f docker-compose ];then
+        echo download docker-compose
+        curl -L "https://github.com/docker/compose/releases/download/v2.32.1/docker-compose-$(uname -s)-$(uname -m)" -o  docker-compose
+        chmod 755  docker-compose
+    else
+        echo docker-compose is cached
+    fi
+
+}
+
+
 do_main(){
     echo "准备命令环境"
     prepare_cmd
+    do_action-cache
     echo "先运行docker以便异步准备网络"
     run_zerotier_docker
     #
