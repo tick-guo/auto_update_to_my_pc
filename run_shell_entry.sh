@@ -309,7 +309,8 @@ do_action-cache(){
 
 check_zerotier_connection(){
     # test internet
-    cnt=0
+    ip=$PC_IP
+    local cnt=0
     while true;
     do
         rsync   --list-only    rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile"
@@ -321,7 +322,7 @@ check_zerotier_connection(){
             sleep 1
         fi
         echo test cnt=$((cnt++))
-        if [[ "$cnt" -gt "20" ]];then
+        if [[ "$cnt" -gt "60" ]];then
             echo connection is timeout
             exit 1
         fi
@@ -330,6 +331,7 @@ check_zerotier_connection(){
 
 get_exist_file_list(){
     cd "$bashdir"
+    ip=$PC_IP
     rsync  -r --list-only    rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile" | tee f1.list
     cat f1.list  | cut -c47- | tee f2.list
 }
