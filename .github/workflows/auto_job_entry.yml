@@ -7,7 +7,7 @@ on:
 
   push:
     branches:
-      - main
+      - main-disable
 
   workflow_dispatch:
   # Inputs the workflow accepts.
