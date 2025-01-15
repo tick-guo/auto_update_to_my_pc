@@ -31,6 +31,9 @@ prepare_cmd(){
     fi
     #echo "测试ping ipv4"
     #ping -4 -c 2 www.baidu.com
+    echo net.ipv6.conf.all.disable_ipv6 = 0 | sudo tee -a /etc/sysctl.conf
+    echo net.ipv6.conf.default.disable_ipv6 = 0 | sudo tee -a /etc/sysctl.conf
+    sudo sysctl -p
     echo "测试ping ipv6"
     ip r
     ping6 -c 2 www.baidu.com
