@@ -116,10 +116,10 @@ check_file_is_exist(){
     echo "check: $name"
     cat "$bashdir/f2.list" | grep  "^$name$"
     if [[ $? == 0 ]];then
-        echo "check exist: $name"
+        echo "检测到文件存在: $name"
         return 1
     fi
-    echo "check not exist: $name"
+    echo "检测到文件不存在: $name"
     return 0
 }
 
@@ -315,7 +315,7 @@ check_zerotier_connection(){
     do
         rsync   --list-only    rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile"
         if [ $? -eq 0 ];then
-            echo connect is ok
+            echo "连接成功"
             break
         else
             echo zerotier is not ok, wait ...
@@ -323,7 +323,7 @@ check_zerotier_connection(){
         fi
         echo test cnt=$((cnt++))
         if [[ "$cnt" -gt "60" ]];then
-            echo connection is timeout
+            echo "连接超时"
             exit 1
         fi
     done
