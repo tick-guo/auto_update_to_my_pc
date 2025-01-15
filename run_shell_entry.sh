@@ -91,24 +91,6 @@ update_file_rsync_to_pc(){
     cd "$upload_dir" || echo cd failed
     echo "统计数据大小"
     du -sh "$(pwd)"
-    # test internet
-    cnt=0
-    while true;
-    do
-        rsync   --list-only    rsync1@$ip::rsync-data    /tmp/ --password-file="$keyfile"
-        if [ $? -eq 0 ];then
-            echo connect is ok
-            break
-        else
-            echo zerotier is not ok, wait ...
-            sleep 1
-        fi
-        echo test cnt=$((cnt++))
-        if [ "$cnt" -gt "10" ];then
-            echo connection is timeout
-            return 1
-        fi
-    done
 
     # 把就日志拉下来
     rsync -vzrP   rsync1@$ip::rsync-data/update_date.log ./update_date.log.old  --password-file="$keyfile"
@@ -122,6 +104,23 @@ update_file_rsync_to_pc(){
     # 再把日志单独推送一次
     rsync -vzrP ./updatefilelist.log  rsync1@$ip::rsync-data --password-file="$keyfile"
     cd "$bashdir" || echo cd failed
+}
+
+# 检测文件是否已经存在，已经存在，就不重复下载了
+# return 1 存在， 0 不存在
+check_file_is_exist(){
+    name="$1"
+    if [[ "$name" == "" ]];then
+        return 0
+    fi
+    echo "check: $name"
+    cat "$bashdir/f2.list" | grep  "^$name$"
+    if [[ $? == 0 ]];then
+        echo "check exist: $name"
+        return 1
+    fi
+    echo "check not exist: $name"
+    return 0
 }
 
 update_legado(){
@@ -146,7 +145,7 @@ update_legado(){
             continue
         fi
 
-        curl -L $browser_download_url -o $legado/$name
+        check_file_is_exist "legado/$name" && curl -L $browser_download_url -o $legado/$name
 
     done
 
@@ -179,7 +178,7 @@ update_notepadpp(){
             continue
         fi
 
-        curl -L $browser_download_url -o $the_dir/$name
+        check_file_is_exist "notepadpp/$name" && curl -L $browser_download_url -o $the_dir/$name
 
     done
 
@@ -212,7 +211,7 @@ update_moonlight(){
             continue
         fi
 
-        curl -L $browser_download_url -o $the_dir/$name
+        check_file_is_exist "moonlight/$name" && curl -L $browser_download_url -o $the_dir/$name
 
     done
 
@@ -246,7 +245,7 @@ update_ImageGlass(){
             continue
         fi
 
-        curl -L $browser_download_url -o $the_dir/$name
+        check_file_is_exist "ImageGlass/$name" && curl -L $browser_download_url -o $the_dir/$name
 
     done
 
@@ -308,6 +307,32 @@ do_action-cache(){
 
 }
 
+check_zerotier_connection(){
+    # test internet
+    cnt=0
+    while true;
+    do
+        rsync   --list-only    rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile"
+        if [ $? -eq 0 ];then
+            echo connect is ok
+            break
+        else
+            echo zerotier is not ok, wait ...
+            sleep 1
+        fi
+        echo test cnt=$((cnt++))
+        if [[ "$cnt" -gt "20" ]];then
+            echo connection is timeout
+            exit 1
+        fi
+    done
+}
+
+get_exist_file_list(){
+    cd "$bashdir"
+    rsync  -r --list-only    rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile" | tee f1.list
+    cat f1.list  | cut -c47- | tee f2.list
+}
 
 do_main(){
     echo "准备命令环境"
@@ -315,6 +340,9 @@ do_main(){
     do_action-cache
     echo "先运行docker以便异步准备网络"
     run_zerotier_docker
+    #
+    check_zerotier_connection
+    get_exist_file_list
     #
     echo "下载文件"
     update_legado
