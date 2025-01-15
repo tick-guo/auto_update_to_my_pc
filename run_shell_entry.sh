@@ -313,7 +313,7 @@ check_zerotier_connection(){
     local cnt=0
     while true;
     do
-        rsync   --list-only    rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile"
+        rsync   --list-only  −−contimeout=1  rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile"
         if [ $? -eq 0 ];then
             echo "连接成功"
             break
