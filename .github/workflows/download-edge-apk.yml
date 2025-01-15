@@ -1,0 +1,41 @@
+name: Download Edge APK
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天运行一次
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  download-edge-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Google Play CLI
+      run: |
+        npm install -g google-play-cli
+
+    - name: Authenticate with Google Play
+      run: |
+        echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY }}" > /tmp/google-play-key.json
+        google-play-cli auth login --service-account-json /tmp/google-play-key.json
+
+    - name: Download Edge APK
+      run: |
+        google-play-cli download --package com.microsoft.emmx --output ./edge-latest.apk
+        ls -lh
+
+    - name: Upload APK to GitHub Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: edge-latest-apk
+        path: ./edge-latest.apk
+
+        
