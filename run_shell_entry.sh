@@ -32,7 +32,8 @@ prepare_cmd(){
     #echo "测试ping ipv4"
     #ping -4 -c 2 www.baidu.com
     echo "测试ping ipv6"
-    ping -6 -c 2 www.baidu.com
+    ip r
+    ping6 -c 2 www.baidu.com
 }
 
 #https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases-for-a-repository
