@@ -328,7 +328,7 @@ check_zerotier_connection(){
         echo test cnt=$((cnt++))
         if [[ "$cnt" -gt "60" ]];then
             echo "连接超时"
-            exit 1
+            return 2
         fi
     done
 }
@@ -346,8 +346,8 @@ do_main(){
     do_action-cache
     echo "先运行docker以便异步准备网络"
     run_zerotier_docker
-    #
-    check_zerotier_connection
+    # 失败不反馈到 github，否则会发邮件，挺烦的
+    check_zerotier_connection || return 0
     get_exist_file_list
     #
     echo "下载文件"
