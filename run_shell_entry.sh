@@ -113,7 +113,7 @@ update_file_rsync_to_pc(){
 # 检测文件是否已经存在，已经存在，就不重复下载了
 # return 1 存在， 0 不存在
 check_file_is_exist(){
-    name="$1"
+    local name="$1"
     if [[ "$name" == "" ]];then
         return 0
     fi
