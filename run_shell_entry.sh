@@ -45,17 +45,15 @@ update_file_use_rsync(){
     echo "推送ALI $upload_dir"
     cd "$upload_dir" || echo cd failed
     # 把就日志拉下来
-    rsync -vz -rlptD -P   rsync1@$env_ip::rsync-data/update_date.log ./update_date.log.old  --password-file="$keyfile"
-    echo "$(date +%F_%T)" > "update_date.log"
-    cat update_date.log.old >> update_date.log
-    rm -rf update_date.log.old
+    rsync -vz -rlptD -P   rsync1@$env_ip::rsync-data/update_date.log /tmp/update_date.log.ali  --password-file="$keyfile"
+    echo "时间:$(date +%F_%T)" > "update_date.log"
+    echo "统计数据大小:$(du -sh .)" >> "update_date.log"
+    find . -type f -printf '%s\t%p\n' >> "update_date.log"
+    cat "/tmp/update_date.log.ali" >> update_date.log
     #
-    ls -lhR > updatefilelist.log
     rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$keyfile" | tee -a "$upload_dir/updatefilelist.log"
     echo ret=$?
-    # 再把日志单独推送一次
-    rsync -vz -rlptD -P ./updatefilelist.log  rsync1@$env_ip::rsync-data --password-file="$keyfile"
-    cd "$bashdir" || echo cd failed
+
 }
 
 # rsync through ssh
@@ -96,19 +94,14 @@ update_file_rsync_to_pc(){
     echo "统计数据大小:$(du -sh .)"
 
     # 把就日志拉下来
-    rsync -vzrP   rsync1@$ip::rsync-data/update_date.log ./update_date.log.old  --password-file="$keyfile"
+    rsync -vzrP   rsync1@$ip::rsync-data/update_date.log "/tmp/update_date.log"  --password-file="$keyfile"
     echo "时间:$(date +%F_%T)" > "update_date.log"
     echo "统计数据大小:$(du -sh .)" >> "update_date.log"
     find . -type f -printf '%s\t%p\n' >> "update_date.log"
-    cat update_date.log.old >> update_date.log
-    rm -rf update_date.log.old
+    cat "/tmp/update_date.log" >> update_date.log
     #
-    #ls -lhR > updatefilelist.log
     rsync -vzrP ./  rsync1@$ip::rsync-data --password-file="$keyfile"  # | tee -a "$upload_dir/updatefilelist.log"
     echo ret=$?
-    # 再把日志单独推送一次
-    #rsync -vzrP ./updatefilelist.log  rsync1@$ip::rsync-data --password-file="$keyfile"
-    #cd "$bashdir" || echo cd failed
 }
 
 # 检测文件是否已经存在，已经存在，就不重复下载了
