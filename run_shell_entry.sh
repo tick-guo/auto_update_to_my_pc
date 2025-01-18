@@ -51,7 +51,7 @@ update_file_use_rsync(){
     find . -type f -printf '%s\t%p\n' >> "update_date.log"
     cat "/tmp/update_date.log.ali" >> update_date.log
     #
-    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$keyfile" | tee -a "$upload_dir/updatefilelist.log"
+    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$keyfile"
     echo ret=$?
 
 }
@@ -75,11 +75,9 @@ update_file_tool_ssh(){
     cat update_date.log.old >> update_date.log
     rm -rf update_date.log.old
     #
-    ls -lhR > updatefilelist.log
-    rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P ./  $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/ | tee -a "$upload_dir/updatefilelist.log"
+    rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P ./  $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/
     echo ret=$?
-    # 再把日志单独推送一次
-    rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P ./updatefilelist.log  $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/
+    #
     ssh  -i $pckey $PC_USER@$PC_IP  ' icacls  E:\githubsync\datapc /reset /t  > nul '
     cd "$bashdir" || echo cd failed
 
@@ -100,7 +98,7 @@ update_file_rsync_to_pc(){
     find . -type f -printf '%s\t%p\n' >> "update_date.log"
     cat "/tmp/update_date.log" >> update_date.log
     #
-    rsync -vzrP ./  rsync1@$ip::rsync-data --password-file="$keyfile"  # | tee -a "$upload_dir/updatefilelist.log"
+    rsync -vzrP ./  rsync1@$ip::rsync-data --password-file="$keyfile"
     echo ret=$?
 }
 
