@@ -1,7 +1,7 @@
 @echo on
 rem D:\a\auto_update_to_my_pc\auto_update_to_my_pc
 echo %CD%
-echo %PATH%
+rem echo %PATH%
 set CUR=%CD%
 
 rem call :zerotier-docker-win
@@ -37,13 +37,15 @@ exit /b
     rem HOMEDRIVE=C:  HOMEPATH=\Users\runneradmin USERPROFILE=C:\Users\runneradmin
 
     ZeroTierOne.msi /quiet
-    set PATH="C:\Program Files (x86)\ZeroTier\One";%PATH%
+    set PATH=C:\Program Files (x86)\ZeroTier\One;%PATH%
 
-    zerotier-cli info
-    zerotier-cli listnetworks
-    zerotier-cli peers
     type "C:\ProgramData\ZeroTier\One\identity.public"
     type "C:\ProgramData\ZeroTier\One\identity.secret"
+
+    zerotier-cli.bat info
+    zerotier-cli.bat listnetworks
+    zerotier-cli.bat peers
+
 
 exit /b
 
