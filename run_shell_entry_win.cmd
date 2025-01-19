@@ -57,7 +57,9 @@ exit /b
     call zerotier-cli.bat join %NETWORK_ID%
     call zerotier-cli.bat listnetworks
     call zerotier-cli.bat peers
-
+    echo 等待分配ip
+    sleep 5
+    call zerotier-cli.bat peers
 
 exit /b
 
