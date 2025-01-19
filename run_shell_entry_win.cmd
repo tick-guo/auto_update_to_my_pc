@@ -4,28 +4,36 @@ echo %CD%
 echo %PATH%
 CUR=%CD%
 
-cd zerotier-win
-dir
+call :zerotier-docker-win
+call :zerotier-msi-win
+echo "结束1"
+exit /b
 
-mkdir data
-echo > .env
-echo NETWORK_ID=$NETWORK_ID > .env
-echo ZEROTIER_API_SECRET=$ZEROTIER_API_SECRET > .env
-echo ZEROTIER_IDENTITY_PUBLIC=$ZEROTIER_IDENTITY_PUBLIC > .env
-echo ZEROTIER_IDENTITY_SECRET=$ZEROTIER_IDENTITY_SECRET > .env
+:zerotier-docker-win
+    cd zerotier-win
+    dir
 
-rem docker-compose up -d
-docker version
-docker compose up -d
-docker images
-docker ps
-docker-compose logs zerotier
-docker inspect zerotier
+    mkdir data
+    echo > .env
+    echo NETWORK_ID=$NETWORK_ID > .env
+    echo ZEROTIER_API_SECRET=$ZEROTIER_API_SECRET > .env
+    echo ZEROTIER_IDENTITY_PUBLIC=$ZEROTIER_IDENTITY_PUBLIC > .env
+    echo ZEROTIER_IDENTITY_SECRET=$ZEROTIER_IDENTITY_SECRET > .env
 
-ping  tb4.fun60.fun
+    rem docker-compose up -d
+    docker version
+    rem 没有windows的docker镜像  windows/amd64
+    docker compose up -d
+    docker images
+    docker ps
+    docker inspect zerotier
 
-curl -L https://download.zerotier.com/RELEASES/1.14.2/dist/ZeroTierOne.msi  -o ZeroTierOne.msi
-dir
+    ping  tb4.fun60.fun
+exit /b
 
+:zerotier-msi-win
+    curl -L https://download.zerotier.com/RELEASES/1.14.2/dist/ZeroTierOne.msi  -o ZeroTierOne.msi
+    dir
+exit /b
 
-echo "结束"
+echo "结束2"
