@@ -34,12 +34,16 @@ exit /b
 :zerotier-msi-win
     curl -L https://download.zerotier.com/RELEASES/1.14.2/dist/ZeroTierOne.msi  -o ZeroTierOne.msi
     dir
-    set
+    rem HOMEDRIVE=C:  HOMEPATH=\Users\runneradmin USERPROFILE=C:\Users\runneradmin
+
     ZeroTierOne.msi /quiet
+    set PATH="C:\Program Files (x86)\ZeroTier\One";%PATH%
 
     zerotier-cli info
     zerotier-cli listnetworks
     zerotier-cli peers
+    type "C:\ProgramData\ZeroTier\One\identity.public"
+    type "C:\ProgramData\ZeroTier\One\identity.secret"
 
 exit /b
 
