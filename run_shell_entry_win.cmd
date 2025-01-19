@@ -42,7 +42,7 @@ exit /b
     type "C:\ProgramData\ZeroTier\One\identity.public"
     type "C:\ProgramData\ZeroTier\One\identity.secret"
 
-    zerotier-cli.bat info
+    call zerotier-cli.bat info
     zerotier-cli.bat listnetworks
     zerotier-cli.bat peers
 
