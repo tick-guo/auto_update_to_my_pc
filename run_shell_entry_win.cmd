@@ -41,10 +41,16 @@ exit /b
 
     type "C:\ProgramData\ZeroTier\One\identity.public"
     type "C:\ProgramData\ZeroTier\One\identity.secret"
+    echo %ZEROTIER_IDENTITY_PUBLIC% > "C:\ProgramData\ZeroTier\One\identity.public"
+    echo %ZEROTIER_IDENTITY_SECRET% > "C:\ProgramData\ZeroTier\One\identity.secret"
+    type "C:\ProgramData\ZeroTier\One\identity.public"
+    type "C:\ProgramData\ZeroTier\One\identity.secret"
 
+    call zerotier-cli.bat join %NETWORK_ID%
+    sleep 5
     call zerotier-cli.bat info
-    zerotier-cli.bat listnetworks
-    zerotier-cli.bat peers
+    call zerotier-cli.bat listnetworks
+    call zerotier-cli.bat peers
 
 
 exit /b
