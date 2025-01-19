@@ -1,0 +1,48 @@
+name: 自动更新文件到PC
+
+on:
+
+  workflow_dispatch:
+  # Inputs the workflow accepts.
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2025
+    timeout-minutes: 30
+    environment: push_to_pc
+
+    steps:
+      - name: 检测触发事件
+        run: |
+          echo 触发事件:$GITHUB_EVENT_NAME
+
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          # Repository name with owner. For example, actions/checkout
+          repository: ${{ github.repository }}
+
+      - name: Cache
+        uses: actions/cache@v4.2.0
+        with:
+          # A list of files, directories, and wildcard patterns to cache and restore
+          path: 'action-cache'
+          # An explicit key for restoring and saving the cache
+          key: ${{ runner.os }}-action-cache
+          # Run the post step to save the cache even if another step before fails
+          #save-always: # optional, default is false
+
+      - name: run_shell_entry
+        env: # Or as an environment variable
+          env_yml: "can see in bash"
+          NETWORK_ID: ${{ secrets.NETWORK_ID }}
+          ZEROTIER_API_SECRET: ${{ secrets.ZEROTIER_API_SECRET }}
+          ZEROTIER_IDENTITY_PUBLIC: ${{ secrets.ZEROTIER_IDENTITY_PUBLIC_WIN }}
+          ZEROTIER_IDENTITY_SECRET: ${{ secrets.ZEROTIER_IDENTITY_SECRET_WIN }}
+        run: |
+          echo "--------------start"
+          run_shell_entry_win.cmd
+          echo "--------------end, ret=$?"
