@@ -38,17 +38,23 @@ exit /b
 
     ZeroTierOne.msi /quiet
     set PATH=C:\Program Files (x86)\ZeroTier\One;%PATH%
-
+    echo 等待服务启动
+    sleep 5
+    call zerotier-cli.bat info
+    echo 修改配置id
     type "C:\ProgramData\ZeroTier\One\identity.public"
     type "C:\ProgramData\ZeroTier\One\identity.secret"
     echo %ZEROTIER_IDENTITY_PUBLIC% > "C:\ProgramData\ZeroTier\One\identity.public"
     echo %ZEROTIER_IDENTITY_SECRET% > "C:\ProgramData\ZeroTier\One\identity.secret"
     type "C:\ProgramData\ZeroTier\One\identity.public"
     type "C:\ProgramData\ZeroTier\One\identity.secret"
-
-    call zerotier-cli.bat join %NETWORK_ID%
+    echo 重启服务
+    sc stop ZeroTierOneService
+    sc start ZeroTierOneService
     sleep 5
+
     call zerotier-cli.bat info
+    call zerotier-cli.bat join %NETWORK_ID%
     call zerotier-cli.bat listnetworks
     call zerotier-cli.bat peers
 
