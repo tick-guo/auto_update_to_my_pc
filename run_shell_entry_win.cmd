@@ -1,6 +1,7 @@
 @echo on
-%CD%
-%PATH%
+rem D:\a\auto_update_to_my_pc\auto_update_to_my_pc
+echo %CD%
+echo %PATH%
 
 cd zerotier-win
 dir
@@ -12,7 +13,8 @@ echo ZEROTIER_API_SECRET=$ZEROTIER_API_SECRET > .env
 echo ZEROTIER_IDENTITY_PUBLIC=$ZEROTIER_IDENTITY_PUBLIC > .env
 echo ZEROTIER_IDENTITY_SECRET=$ZEROTIER_IDENTITY_SECRET > .env
 
-docker-compose up -d
+rem docker-compose up -d
+docker compose up -d
 docker images
 sleep 5
 docker-compose logs zerotier
