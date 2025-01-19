@@ -42,6 +42,7 @@ jobs:
           ZEROTIER_API_SECRET: ${{ secrets.ZEROTIER_API_SECRET }}
           ZEROTIER_IDENTITY_PUBLIC: ${{ secrets.ZEROTIER_IDENTITY_PUBLIC_WIN }}
           ZEROTIER_IDENTITY_SECRET: ${{ secrets.ZEROTIER_IDENTITY_SECRET_WIN }}
+        shell: cmd
         run: |
           echo "--------------start"
           run_shell_entry_win.cmd
