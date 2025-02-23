@@ -134,7 +134,7 @@ update_github_soft(){
                 # 后缀 不包含点号
                 end_type="${name##*.}"
                 tag_tmp=$(jq -r '.[0].name' 1.log)
-                to_name="${begin_name}_${tag_tmp}.${end_type}"
+                to_name="${name}_${tag_tmp}.${end_type}"
             else
                 to_name=$name
             fi
