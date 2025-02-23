@@ -130,6 +130,7 @@ soft_json_config='
 {"soft_dir_name": "moonlight","soft_repo": "moonlight-stream/moonlight-qt","soft_filter": "Portable.*x64"},
 {"soft_dir_name": "ImageGlass","soft_repo": "d2phap/ImageGlass","soft_filter": "x64.*msi"},
 {"soft_dir_name": "bitwarden","soft_repo": "bitwarden/android","soft_filter": "bitwarden.apk", "add_tag": true },
+{"soft_dir_name": "LibChecker","soft_repo": "LibChecker/LibChecker","soft_filter": "apk"},
 {}
 ]
 '
