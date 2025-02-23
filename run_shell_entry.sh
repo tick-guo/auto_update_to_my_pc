@@ -40,50 +40,6 @@ prepare_cmd(){
 }
 
 #https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases-for-a-repository
-
-update_file_use_rsync(){
-    echo "推送ALI $upload_dir"
-    cd "$upload_dir" || echo cd failed
-    # 把就日志拉下来
-    rsync -vz -rlptD -P   rsync1@$env_ip::rsync-data/update_date.log /tmp/update_date.log.ali  --password-file="$keyfile"
-    echo "时间:$(date +%F_%T)" > "update_date.log"
-    echo "统计数据大小:$(du -sh .)" >> "update_date.log"
-    find . -type f -printf '%s\t%p\n' >> "update_date.log"
-    cat "/tmp/update_date.log.ali" >> update_date.log
-    #
-    rsync -vz -rlptD -P ./  rsync1@$env_ip::rsync-data --password-file="$keyfile"
-    echo ret=$?
-
-}
-
-# rsync through ssh
-update_file_tool_ssh(){
-    echo "推送PC $upload_dir"
-    cd $bashdir
-    pckey="$bashdir/pc-key"
-    echo "$PC_KEY" > "$bashdir/pc-key"
-    #sudo apt install dos2unix -y
-    #dos2unix "$bashdir/pc-key"
-    chmod 600 "$bashdir/pc-key"
-    #
-    cd "$upload_dir" || echo cd failed
-    #test
-    ssh -o StrictHostKeyChecking=no -i $pckey $PC_USER@$PC_IP  'cd'
-    # 把就日志拉下来
-    rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/update_date.log ./update_date.log.old
-    echo "$(date +%F_%T)" > "update_date.log"
-    cat update_date.log.old >> update_date.log
-    rm -rf update_date.log.old
-    #
-    rsync -e "ssh -o StrictHostKeyChecking=no -i $pckey " -vz -rlptD -P ./  $PC_USER@$PC_IP:/cygdrive/e/githubsync/datapc/
-    echo ret=$?
-    #
-    ssh  -i $pckey $PC_USER@$PC_IP  ' icacls  E:\githubsync\datapc /reset /t  > nul '
-    cd "$bashdir" || echo cd failed
-
-}
-
-
 # windows rsync daemon
 update_file_rsync_to_pc(){
     ip=$PC_IP
@@ -303,11 +259,6 @@ do_main(){
     echo "列举文件"
     find "$upload_dir"
     #
-    echo "发送文件到云服务器"
-    #update_file_tool
-    update_file_use_rsync
-    # 通过ssh通道发送，不再使用
-    #update_file_tool_ssh
     echo "发送文件到PC"
     update_file_rsync_to_pc
     #
