@@ -121,6 +121,7 @@ check_file_is_exist(){
 
 
 # 通用github下载模板
+# bitwarden 文件名不包含版本号，增加 add_tag 标记，来追加版本号
 soft_json_config='
 [
 {"soft_dir_name": "trzsz","soft_repo": "trzsz/trzsz-go","soft_filter": "win.*x86"},
@@ -128,6 +129,7 @@ soft_json_config='
 {"soft_dir_name": "notepadpp","soft_repo": "notepad-plus-plus/notepad-plus-plus","soft_filter": "x64.exe"},
 {"soft_dir_name": "moonlight","soft_repo": "moonlight-stream/moonlight-qt","soft_filter": "Portable.*x64"},
 {"soft_dir_name": "ImageGlass","soft_repo": "d2phap/ImageGlass","soft_filter": "x64.*msi"},
+{"soft_dir_name": "bitwarden","soft_repo": "bitwarden/android","soft_filter": "bitwarden.apk", "add_tag": true },
 {}
 ]
 '
@@ -143,6 +145,7 @@ update_github_soft(){
         soft_dir_name=$(echo $soft_json_config | jq -r ".[$i].soft_dir_name")
         soft_repo=$(echo $soft_json_config | jq -r ".[$i].soft_repo")
         soft_filter=$(echo $soft_json_config | jq -r ".[$i].soft_filter")
+        add_tag=$(echo $soft_json_config | jq -r ".[$i].add_tag")
         echo $i: ${soft_dir_name}, ${soft_repo}, ${soft_filter}
         if [[ "$soft_dir_name" == "null" ]];then
             echo "null skip"
@@ -167,8 +170,16 @@ update_github_soft(){
             #echo "index=$i"
             browser_download_url=$(jq -r '.[0].assets['$i'].browser_download_url' 1.log)
             name=$(jq -r '.[0].assets['$i'].name' 1.log)
+            #
+            if [[ "${add_tag}" == "true" ]];then
+                tag_tmp=$(jq -r '.[0].name' 1.log)
+                to_name=${name}_${tag_tmp}.apk
+            else
+                to_name=$name
+            fi
+
             #echo "$name => $browser_download_url"
-            choice=$(echo "$name"  | grep "${soft_filter}" )
+            choice=$(echo "$to_name"  | grep "${soft_filter}" )
             if [ "$choice" == "" ];then
                 #echo skip $name
                 continue
@@ -179,7 +190,7 @@ update_github_soft(){
             fi
 
             echo "符合下载命名：$name"
-            check_file_is_exist "${soft_dir_name}/$name" && curl -L $browser_download_url -o $the_dir/$name
+            check_file_is_exist "${soft_dir_name}/$to_name" && curl -L $browser_download_url -o $the_dir/$to_name
 
         done
         echo "结束本轮下载"
