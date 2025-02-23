@@ -129,8 +129,12 @@ update_github_soft(){
             name=$(jq -r '.[0].assets['$i'].name' 1.log)
             #
             if [[ "${add_tag}" == "true" ]];then
+                # 文件名 无后缀 不包含点号
+                begin_name="${name%.*}"
+                # 后缀 不包含点号
+                end_type="${name##*.}"
                 tag_tmp=$(jq -r '.[0].name' 1.log)
-                to_name="${name}_${tag_tmp}.apk"
+                to_name="${begin_name}_${tag_tmp}.${end_type}"
             else
                 to_name=$name
             fi
