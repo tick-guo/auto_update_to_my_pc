@@ -130,7 +130,7 @@ update_github_soft(){
             #
             if [[ "${add_tag}" == "true" ]];then
                 tag_tmp=$(jq -r '.[0].name' 1.log)
-                to_name=${name}_${tag_tmp}.apk
+                to_name="${name}_${tag_tmp}.apk"
             else
                 to_name=$name
             fi
@@ -147,7 +147,7 @@ update_github_soft(){
             fi
 
             echo "符合下载命名：$name"
-            check_file_is_exist "${soft_dir_name}/$to_name" && curl -L $browser_download_url -o $the_dir/$to_name
+            check_file_is_exist "${soft_dir_name}/$to_name" && curl -L $browser_download_url -o "$the_dir/$to_name"
 
         done
         echo "结束本轮下载"
