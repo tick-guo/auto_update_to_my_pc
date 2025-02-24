@@ -87,6 +87,7 @@ soft_json_config='
 {"soft_dir_name": "ImageGlass","soft_repo": "d2phap/ImageGlass","soft_filter": "x64.*msi"},
 {"soft_dir_name": "bitwarden","soft_repo": "bitwarden/android","soft_filter": "bitwarden.apk", "add_tag": true },
 {"soft_dir_name": "LibChecker","soft_repo": "LibChecker/LibChecker","soft_filter": "apk"},
+{"soft_dir_name": "Win32-OpenSSH","soft_repo": "PowerShell/Win32-OpenSSH","soft_filter": "Win64", "add_tag": true },
 {}
 ]
 '
