@@ -81,6 +81,11 @@ check_file_is_exist(){
 soft_json_config='
 [
 {"soft_dir_name": "trzsz","soft_repo": "trzsz/trzsz-go","soft_filter": "win.*x86"},
+{"soft_dir_name": "trzsz","soft_repo": "trzsz/trzsz-go","soft_filter": "linux.*x86"},
+
+{"soft_dir_name": "trzsz-ssh","soft_repo": "trzsz/trzsz-ssh","soft_filter": "win.*x86"},
+{"soft_dir_name": "trzsz-ssh","soft_repo": "trzsz/trzsz-ssh","soft_filter": "linux.*x86"},
+
 {"soft_dir_name": "legado","soft_repo": "gedoor/legado","soft_filter": ""},
 {"soft_dir_name": "notepadpp","soft_repo": "notepad-plus-plus/notepad-plus-plus","soft_filter": "x64.exe"},
 {"soft_dir_name": "moonlight","soft_repo": "moonlight-stream/moonlight-qt","soft_filter": "Portable.*x64"},
