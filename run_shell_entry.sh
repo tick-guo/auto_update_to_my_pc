@@ -88,6 +88,7 @@ soft_json_config='
 {"soft_dir_name": "bitwarden","soft_repo": "bitwarden/android","soft_filter": "bitwarden.apk", "add_tag": true },
 {"soft_dir_name": "LibChecker","soft_repo": "LibChecker/LibChecker","soft_filter": "apk"},
 {"soft_dir_name": "Win32-OpenSSH","soft_repo": "PowerShell/Win32-OpenSSH","soft_filter": "Win64", "add_tag": true },
+{"soft_dir_name": "v2rayN","soft_repo": "2dust/v2rayN","soft_filter": "^(?=.*windows)(?=.*desktop)(?!.*arm).+", "add_tag": true },
 {}
 ]
 '
@@ -141,7 +142,7 @@ update_github_soft(){
             fi
 
             #echo "$name => $browser_download_url"
-            choice=$(echo "$to_name"  | grep "${soft_filter}" )
+            choice=$(echo "$to_name"  | grep -Pi "${soft_filter}" )
             if [ "$choice" == "" ];then
                 #echo skip $name
                 continue
