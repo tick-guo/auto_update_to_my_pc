@@ -37,6 +37,7 @@ prepare_cmd(){
     echo "测试ping ipv6"
     ip r
     ping6 -c 2 www.baidu.com
+    ping6 -c 2 ftp.mozilla.org
 }
 
 #https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases-for-a-repository
