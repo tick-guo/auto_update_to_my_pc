@@ -194,7 +194,7 @@ firefox_android_download(){
     name="fenix-${vermax}.multi.android-arm64-v8a.apk"
     #
     echo "符合下载命名：$name"
-    check_file_is_exist "${soft_dir_name}/$to_name" && curl -L $browser_download_url -o "$the_dir/$name"
+    check_file_is_exist "${soft_dir_name}/$name" && cd "$the_dir" && wget "$browser_download_url"
     echo "结束本轮下载"
 }
 
