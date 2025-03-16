@@ -171,6 +171,32 @@ update_github_soft(){
 
 }
 
+# firefox 定制， 没有在github上
+firefox_android_download(){
+    echo 准备目录
+    local soft_dir_name="firefox_android"
+    echo ${soft_dir_name}
+    echo "开始下载，只打印需要下载的，忽略的不会显示日志"
+    cd "$bashdir"
+    the_dir="$upload_dir/${soft_dir_name}"
+    mkdir -p "$the_dir"
+    echo 检测版本
+    vermax=$(curl https://ftp.mozilla.org/pub/fenix/releases/    | grep fenix | grep -v beta | grep -vE "b[0-9]"  |  grep -Po '\d+\.\d+\.\d+|\d+\.\d+'  | sort -V | tail -n1 )
+    echo firefox android vermax=$vermax
+    if [ "$vermax" != "" ];then
+        #wget https://ftp.mozilla.org/pub/fenix/releases/${vermax}/android/fenix-${vermax}-android-arm64-v8a/fenix-${vermax}.multi.android-arm64-v8a.apk
+        browser_download_url="https://ftp.mozilla.org/pub/fenix/releases/${vermax}/android/fenix-${vermax}-android-arm64-v8a/fenix-${vermax}.multi.android-arm64-v8a.apk"
+    else
+        echo vermax is null
+        return
+    fi
+    echo 文件名
+    name="fenix-${vermax}.multi.android-arm64-v8a.apk"
+    #
+    echo "符合下载命名：$name"
+    check_file_is_exist "${soft_dir_name}/$to_name" && curl -L $browser_download_url -o "$the_dir/$name"
+    echo "结束本轮下载"
+}
 
 run_zerotier_docker(){
     mkdir -p $bashdir/zerotier
@@ -270,6 +296,7 @@ do_main(){
     echo "下载文件"
     echo "通用下载模板"
     update_github_soft
+    firefox_android_download
     #
     echo "列举文件"
     find "$upload_dir"
