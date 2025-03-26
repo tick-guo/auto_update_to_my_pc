@@ -128,6 +128,20 @@ sqlite3 "$DB_FILE"  < insert.sql
 return $?
 }
 
+function db_check_url_exist(){
+    echo > count.sql
+    echo "
+        select count(1) from software_versions where url = '$1';
+    " > count.sql
+   count=$(sqlite3 "$DB_FILE"  < count.sql)
+   if [ $? -eq 0 ];then
+        return $count
+   else
+       # 0 就需要下载
+        return 0
+   fi
+}
+
 test1(){
 insert_line "描述" "dir" "file" "md5" "1234" "url"
 }
@@ -197,7 +211,9 @@ update_github_soft(){
             fi
 
             echo "符合下载命名：$name"
-            check_file_is_exist "${soft_dir_name}/$to_name"
+            #check_file_is_exist "${soft_dir_name}/$to_name"
+            # 用下载地址来判断应该准确， 会不会不同的包更新到同样的地址？
+            db_check_url_exist "$browser_download_url"
             if [ $? -eq 0 ];then
 
                 curl -L $browser_download_url -o "$the_dir/$to_name"
