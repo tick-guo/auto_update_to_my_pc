@@ -343,7 +343,8 @@ check_zerotier_connection(){
 pull_db_and_check(){
     cd "$bashdir" || exit 1
     local ip=$PC_IP
-    rsync -vzrP   rsync1@$ip::rsync-data/_db/ "/tmp/_db/"  --password-file="$keyfile"
+    rsync -vzrP   rsync1@$ip::rsync-data/_db/db.sqlite3  "/tmp/_db/"  --password-file="$keyfile"
+    rsync -vzrP   rsync1@$ip::rsync-data/_db/db.md5      "/tmp/_db/"  --password-file="$keyfile"
     ls -l "/tmp/_db/"
     md51=$(md5sum "/tmp/_db/db.sqlite3" | awk '{print $1}')
     md52=$(cat "/tmp/_db/db.md5" | awk '{print $1}')
@@ -359,7 +360,7 @@ push_db_and_check(){
     cd "$bashdir" || exit 1
     local ip=$PC_IP
     rsync -vzrP "/tmp/_db/db.sqlite3"  rsync1@$ip::rsync-data/_db/ --password-file="$keyfile"
-    md5sum /tmp/_db/db.sqlite3 > /tmp/_db/db.md5
+    md5sum "/tmp/_db/db.sqlite3" > "/tmp/_db/db.md5"
     rsync -vzrP "/tmp/_db/db.md5"  rsync1@$ip::rsync-data/_db/ --password-file="$keyfile"
 }
 
