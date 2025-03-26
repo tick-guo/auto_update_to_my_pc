@@ -102,6 +102,36 @@ soft_json_config='
 ]
 '
 
+
+function insert_line(){
+
+echo > insert.sql
+echo "
+INSERT INTO software_versions (
+    soft_desc,
+    soft_dir,
+    soft_file,
+    md5sum,
+    file_size,
+    url
+) VALUES (
+    '$1',  -- 描述
+    '$2', -- dir
+    '$3',  -- file
+    '$4',  -- 32位MD5示例
+     $5, -- file_size
+    '$6'  -- url
+); " > insert.sql
+cat insert.sql
+sqlite3 db.sqlite3  < insert.sql
+return $?
+}
+
+test1(){
+insert_line "描述" "dir" "file" "md5" "1234" "url"
+}
+
+
 update_github_soft(){
     local soft_dir_name
     local soft_repo
@@ -166,7 +196,17 @@ update_github_soft(){
             fi
 
             echo "符合下载命名：$name"
-            check_file_is_exist "${soft_dir_name}/$to_name" && curl -L $browser_download_url -o "$the_dir/$to_name"
+            check_file_is_exist "${soft_dir_name}/$to_name"
+            if [ $? -eq 0 ];then
+
+                curl -L $browser_download_url -o "$the_dir/$to_name"
+                md5=$(md5sum "$the_dir/$to_name" | awk '{print $1}')
+                size=$(stat --format=%s "$the_dir/$to_name" )
+                insert_line "描述:$soft_dir_name" "$soft_dir_name" "$to_name" "$md5" "$size" "$browser_download_url"
+                if [ $? -ne 0 ];then
+                    echo "sql insert error "
+                fi
+            fi
 
         done
         echo "结束本轮下载"
@@ -281,10 +321,34 @@ check_zerotier_connection(){
 }
 
 get_exist_file_list(){
-    cd "$bashdir"
+    cd "$bashdir" || exit 1
     ip=$PC_IP
     rsync  -r --list-only    rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile" | tee f1.list
     cat f1.list  | cut -c47- | tee f2.list
+}
+
+
+pull_db_and_check(){
+    cd "$bashdir" || exit 1
+    local ip=$PC_IP
+    rsync -vzrP   rsync1@$ip::rsync-data/_db/ "/tmp/_db/"  --password-file="$keyfile"
+    ls -l "/tmp/_db/"
+    md51=$(md5sum "/tmp/_db/db.sqlite3" | awk '{print $1}')
+    md52=$(cat "/tmp/_db/db.md5" | awk '{print $1}')
+    if [ "$md51" != "$md52" ];then
+        echo "db check error"
+        exit 1
+    else
+        echo "db check success"
+    fi
+}
+
+push_db_and_check(){
+    cd "$bashdir" || exit 1
+    local ip=$PC_IP
+    rsync -vzrP "/tmp/_db/db.sqlite3"  rsync1@$ip::rsync-data/_db/ --password-file="$keyfile"
+    md5sum /tmp/_db/db.sqlite3 > /tmp/_db/db.md5
+    rsync -vzrP "/tmp/_db/db.md5"  rsync1@$ip::rsync-data/_db/ --password-file="$keyfile"
 }
 
 do_main(){
@@ -297,6 +361,8 @@ do_main(){
     check_zerotier_connection || return 0
     get_exist_file_list
     #
+    pull_db_and_check
+    #
     echo "下载文件"
     echo "通用下载模板"
     update_github_soft
@@ -307,6 +373,8 @@ do_main(){
     #
     echo "发送文件到PC"
     update_file_rsync_to_pc
+    #
+    push_db_and_check
     #
     end_clean_file
 }
