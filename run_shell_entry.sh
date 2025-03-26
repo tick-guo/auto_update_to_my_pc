@@ -62,22 +62,6 @@ update_file_rsync_to_pc(){
     echo ret=$?
 }
 
-# 检测文件是否已经存在，已经存在，就不重复下载了
-# return 1 存在， 0 不存在
-check_file_is_exist(){
-    local name="$1"
-    if [[ "$name" == "" ]];then
-        return 0
-    fi
-    echo "check: $name"
-    cat "$bashdir/f2.list" | grep  "^$name$"
-    if [[ $? == 0 ]];then
-        echo "检测到文件存在: $name"
-        return 1
-    fi
-    echo "检测到文件不存在: $name"
-    return 0
-}
 
 
 # 通用github下载模板
@@ -211,7 +195,6 @@ update_github_soft(){
             fi
 
             echo "符合下载命名：$name"
-            #check_file_is_exist "${soft_dir_name}/$to_name"
             # 用下载地址来判断应该准确， 会不会不同的包更新到同样的地址？
             db_check_url_exist "$browser_download_url"
             if [ $? -eq 0 ];then
@@ -253,9 +236,21 @@ firefox_android_download(){
     fi
     echo 文件名
     name="fenix-${vermax}.multi.android-arm64-v8a.apk"
+    to_name=$name
     #
     echo "符合下载命名：$name"
-    check_file_is_exist "${soft_dir_name}/$name" && cd "$the_dir" && wget "$browser_download_url"
+    cd "$the_dir" || exit 1
+    db_check_url_exist "$browser_download_url"
+    if [ $? -eq 0 ];then
+        wget "$browser_download_url"
+        md5=$(md5sum "${soft_dir_name}/$name" | awk '{print $1}')
+        size=$(stat --format=%s "${soft_dir_name}/$name" )
+        insert_line "描述:$soft_dir_name" "$soft_dir_name" "$to_name" "$md5" "$size" "$browser_download_url"
+        if [ $? -ne 0 ];then
+            echo "sql insert error "
+        fi
+    fi
+
     echo "结束本轮下载"
 }
 
@@ -337,12 +332,7 @@ check_zerotier_connection(){
     done
 }
 
-get_exist_file_list(){
-    cd "$bashdir" || exit 1
-    ip=$PC_IP
-    rsync  -r --list-only    rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile" | tee f1.list
-    cat f1.list  | cut -c47- | tee f2.list
-}
+
 
 
 pull_db_and_check(){
@@ -376,7 +366,7 @@ do_main(){
     run_zerotier_docker
     # 失败不反馈到 github，否则会发邮件，挺烦的
     check_zerotier_connection || return 0
-    get_exist_file_list
+
     #
     pull_db_and_check
     #
