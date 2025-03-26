@@ -103,6 +103,7 @@ soft_json_config='
 '
 
 
+DB_FILE="/tmp/_db/db.sqlite3"
 function insert_line(){
 
 echo > insert.sql
@@ -123,7 +124,7 @@ INSERT INTO software_versions (
     '$6'  -- url
 ); " > insert.sql
 cat insert.sql
-sqlite3 db.sqlite3  < insert.sql
+sqlite3 "$DB_FILE"  < insert.sql
 return $?
 }
 
