@@ -90,7 +90,7 @@ soft_json_config='
 DB_FILE="/tmp/_db/db.sqlite3"
 function insert_line(){
 
-echo > insert.sql
+echo > /tmp/insert.sql
 echo "
 INSERT INTO software_versions (
     soft_desc,
@@ -101,29 +101,34 @@ INSERT INTO software_versions (
     url
 ) VALUES (
     '$1',  -- 描述
-    '$2', -- dir
+    '$2', -- dir or mode
     '$3',  -- file
     '$4',  -- 32位MD5示例
-     $5, -- file_size
+    '$5', -- file_size
     '$6'  -- url
-); " > insert.sql
-cat insert.sql
-sqlite3 "$DB_FILE"  < insert.sql
+); " > /tmp/insert.sql
+cat /tmp/insert.sql
+sqlite3 "$DB_FILE"  < /tmp/insert.sql
 return $?
 }
 
 function db_check_url_exist(){
-    echo > count.sql
-    echo "
-        select count(1) from software_versions where url = '$1';
-    " > count.sql
-   count=$(sqlite3 "$DB_FILE"  < count.sql)
-   if [ $? -eq 0 ];then
+    echo > /tmp/count.sql
+    echo " select count(1) from software_versions where url = '$1';"  > /tmp/count.sql
+    count=$(sqlite3 "$DB_FILE"  < /tmp/count.sql)
+    if [ $? -eq 0 ];then
+        echo count=$count
+        if [ "$count" == 0 ];then
+            echo "需要下载"
+        else
+            echo "不需要下载"
+        fi
         return $count
-   else
-       # 0 就需要下载
+    else
+        # 0 就需要下载
+        echo "需要下载"
         return 0
-   fi
+    fi
 }
 
 test1(){
@@ -243,8 +248,8 @@ firefox_android_download(){
     db_check_url_exist "$browser_download_url"
     if [ $? -eq 0 ];then
         wget "$browser_download_url"
-        md5=$(md5sum "${soft_dir_name}/$name" | awk '{print $1}')
-        size=$(stat --format=%s "${soft_dir_name}/$name" )
+        md5=$(md5sum "$name" | awk '{print $1}')
+        size=$(stat --format=%s "$name" )
         insert_line "描述:$soft_dir_name" "$soft_dir_name" "$to_name" "$md5" "$size" "$browser_download_url"
         if [ $? -ne 0 ];then
             echo "sql insert error "
@@ -256,7 +261,7 @@ firefox_android_download(){
 
 run_zerotier_docker(){
     mkdir -p $bashdir/zerotier
-    cd $bashdir/zerotier
+    cd $bashdir/zerotier || exit 1
     #
 
     ls -la
