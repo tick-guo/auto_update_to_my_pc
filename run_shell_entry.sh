@@ -82,6 +82,7 @@ soft_json_config='
 {"soft_dir_name": "LibChecker","soft_repo": "LibChecker/LibChecker","soft_filter": "apk"},
 {"soft_dir_name": "Win32-OpenSSH","soft_repo": "PowerShell/Win32-OpenSSH","soft_filter": "Win64", "add_tag": true },
 {"soft_dir_name": "v2rayN","soft_repo": "2dust/v2rayN","soft_filter": "^(?=.*windows)(?=.*desktop)(?!.*arm).+", "add_tag": true },
+{"soft_dir_name": "my-win-openssh","soft_repo": "tick-guo/openssh-portable","soft_filter": ""},
 {}
 ]
 '
