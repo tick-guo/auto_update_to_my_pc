@@ -322,7 +322,10 @@ check_zerotier_connection(){
     local cnt=0
     while true;
     do
-        rsync   --list-only --contimeout=1 rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile"
+         # --timeout=SECONDS       set I/O timeout in seconds
+         # --contimeout=SECONDS    set daemon connection timeout in seconds
+
+        rsync   --list-only --contimeout=1 --timeout=5 rsync1@$ip::rsync-data /tmp/ --password-file="$keyfile"
         if [ $? -eq 0 ];then
             echo "连接成功"
             break
