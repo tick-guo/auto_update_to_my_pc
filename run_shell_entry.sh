@@ -400,7 +400,7 @@ pull_db_and_check(){
         echo "db1 db2 both ok, to select big version id"
         id1=$(db_get_max_id "/tmp/_db/db1.sqlite3")
         id2=$(db_get_max_id "/tmp/_db/db2.sqlite3")
-        echo id=$id1,id2=$id2
+        echo id1=$id1,id2=$id2
         if [ "$id1" -gt "$id2" ];then
             echo use db1
             cp -f "/tmp/_db/db1.sqlite3" "/tmp/_db/db2.sqlite3"
