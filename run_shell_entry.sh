@@ -52,6 +52,7 @@ update_file_rsync_to_pc(){
     rsync -vzrP   rsync1@$ip::rsync-data/update_date.log "/tmp/update_date.log"  --password-file="$keyfile"
     # 产生新的日志
     echo "时间:$(date +%F_%T)" > "update_date.log"
+    echo "db1=$db1, db2=$db2, copy and use DB_FILE=$DB_FILE" >> "update_date.log"
     echo "统计数据大小:$(du -sh .)" >> "update_date.log"
     find . -type f -printf '%s\t%p\n' >> "update_date.log"
     echo "============================分割线================================" >> "update_date.log"
