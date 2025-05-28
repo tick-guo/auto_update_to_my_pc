@@ -366,23 +366,24 @@ pull_db_and_check(){
     ls -l "/tmp/_db/"
     md51=$(md5sum "/tmp/_db/db1.sqlite3" | awk '{print $1}')
     md52=$(cat "/tmp/_db/db1.sqlite3.md5" | awk '{print $1}')
-    if [ "$md51" != "$md52" ];then
-        echo "db1 check error"
-        db1=error
-    else
+    if [[ "$md51" == "$md52" && "$md51" != "" ]];then
         echo "db1 check success"
         db1=ok
+    else
+        echo "db1 check error"
+        db1=error
     fi
 
     md51=$(md5sum "/tmp/_db/db2.sqlite3" | awk '{print $1}')
     md52=$(cat "/tmp/_db/db2.sqlite3.md5" | awk '{print $1}')
-    if [ "$md51" != "$md52" ];then
-        echo "db2 check error"
-        db2=error
-    else
+    if [[ "$md51" == "$md52" && "$md51" != "" ]];then
         echo "db2 check success"
         db2=ok
+    else
+        echo "db2 check error"
+        db2=error
     fi
+
     if [[ "$db1" == "error" && "$db2" == "ok" ]];then
         echo "db1 error, db2 ok"
         DB_FILE="/tmp/_db/db2.sqlite3"
