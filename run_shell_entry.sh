@@ -386,10 +386,13 @@ pull_db_and_check(){
 
     if [[ "$db1" == "error" && "$db2" == "ok" ]];then
         echo "db1 error, db2 ok"
-        DB_FILE="/tmp/_db/db2.sqlite3"
+        cp -f "/tmp/_db/db2.sqlite3" "/tmp/_db/db1.sqlite3"
+        # db2 正确， 为保护db2， 交叉使用为db1
+        DB_FILE="/tmp/_db/db1.sqlite3"
     elif [[ "$db1" == "ok" && "$db2" == "error" ]]; then
         echo "db1 ok, db2 error"
-        DB_FILE="/tmp/_db/db1.sqlite3"
+        cp -f "/tmp/_db/db1.sqlite3" "/tmp/_db/db2.sqlite3"
+        DB_FILE="/tmp/_db/db2.sqlite3"
     elif [[ "$db1" == "error" && "$db2" == "error" ]]; then
         echo "db1 is error and db2 is error , exit !!!"
         exit 1
@@ -399,9 +402,13 @@ pull_db_and_check(){
         id2=$(db_get_max_id "/tmp/_db/db2.sqlite3")
         echo id=$id1,id2=$id2
         if [ "$id1" -gt "$id2" ];then
-            DB_FILE="/tmp/_db/db1.sqlite3"
-        else
+            echo use db1
+            cp -f "/tmp/_db/db1.sqlite3" "/tmp/_db/db2.sqlite3"
             DB_FILE="/tmp/_db/db2.sqlite3"
+        else
+            echo usb db2
+            cp -f "/tmp/_db/db2.sqlite3" "/tmp/_db/db1.sqlite3"
+            DB_FILE="/tmp/_db/db1.sqlite3"
         fi
     else
         echo "no possible here !!!"
