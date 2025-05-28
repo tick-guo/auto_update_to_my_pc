@@ -132,6 +132,18 @@ function db_check_url_exist(){
     fi
 }
 
+function db_get_max_id(){
+    local file
+    file="$DB_FILE"
+    if [ "$1" != "" ];then
+        file="$1"
+    fi
+    echo > /tmp/count.sql
+    echo " select max(id) from software_versions;"  > /tmp/count.sql
+    # 直接输出
+    sqlite3 "$file"  < /tmp/count.sql | tail -1
+}
+
 test1(){
 insert_line "描述" "dir" "file" "md5" "1234" "url"
 }
@@ -347,25 +359,62 @@ check_zerotier_connection(){
 pull_db_and_check(){
     cd "$bashdir" || exit 1
     local ip=$PC_IP
-    rsync -vzrP   rsync1@$ip::rsync-data/_db/db.sqlite3  "/tmp/_db/"  --password-file="$keyfile"
-    rsync -vzrP   rsync1@$ip::rsync-data/_db/db.md5      "/tmp/_db/"  --password-file="$keyfile"
+    rsync -vzrP   rsync1@$ip::rsync-data/_db/db1.sqlite3 rsync1@$ip::rsync-data/_db/db1.sqlite3.md5 \
+    rsync1@$ip::rsync-data/_db/db2.sqlite3 rsync1@$ip::rsync-data/_db/db2.sqlite3.md5 \
+     "/tmp/_db/"  --password-file="$keyfile"
+
     ls -l "/tmp/_db/"
-    md51=$(md5sum "/tmp/_db/db.sqlite3" | awk '{print $1}')
-    md52=$(cat "/tmp/_db/db.md5" | awk '{print $1}')
+    md51=$(md5sum "/tmp/_db/db1.sqlite3" | awk '{print $1}')
+    md52=$(cat "/tmp/_db/db1.sqlite3.md5" | awk '{print $1}')
     if [ "$md51" != "$md52" ];then
-        echo "db check error"
-        exit 1
+        echo "db1 check error"
+        db1=error
     else
-        echo "db check success"
+        echo "db1 check success"
+        db1=ok
     fi
+
+    md51=$(md5sum "/tmp/_db/db2.sqlite3" | awk '{print $1}')
+    md52=$(cat "/tmp/_db/db2.sqlite3.md5" | awk '{print $1}')
+    if [ "$md51" != "$md52" ];then
+        echo "db2 check error"
+        db2=error
+    else
+        echo "db2 check success"
+        db2=ok
+    fi
+    if [[ "$db1" == "error" && "$db2" == "ok" ]];then
+        echo "db1 error, db2 ok"
+        DB_FILE="/tmp/_db/db2.sqlite3"
+    elif [[ "$db1" == "ok" && "$db2" == "error" ]]; then
+        echo "db1 ok, db2 error"
+        DB_FILE="/tmp/_db/db1.sqlite3"
+    elif [[ "$db1" == "error" && "$db2" == "error" ]]; then
+        echo "db1 is error and db2 is error , exit !!!"
+        exit 1
+    elif [[ "$db1" == "ok" && "$db2" == "ok" ]]; then
+        echo "db1 db2 both ok, to select big version id"
+        id1=$(db_get_max_id "/tmp/_db/db1.sqlite3")
+        id2=$(db_get_max_id "/tmp/_db/db2.sqlite3")
+        echo id=$id1,id2=$id2
+        if [ "$id1" -gt "$id2" ];then
+            DB_FILE="/tmp/_db/db1.sqlite3"
+        else
+            DB_FILE="/tmp/_db/db2.sqlite3"
+        fi
+    else
+        echo "no possible here !!!"
+        exit 1
+    fi
+    echo select DB_FILE=$DB_FILE
 }
 
 push_db_and_check(){
     cd "$bashdir" || exit 1
     local ip=$PC_IP
-    rsync -vzrP "/tmp/_db/db.sqlite3"  rsync1@$ip::rsync-data/_db/ --password-file="$keyfile"
-    md5sum "/tmp/_db/db.sqlite3" > "/tmp/_db/db.md5"
-    rsync -vzrP "/tmp/_db/db.md5"  rsync1@$ip::rsync-data/_db/ --password-file="$keyfile"
+    md5sum "$DB_FILE" > "$DB_FILE.md5"
+    rsync -vzrP "$DB_FILE" "$DB_FILE.md5"  rsync1@$ip::rsync-data/_db/ --password-file="$keyfile"
+
 }
 
 do_main(){
