@@ -433,7 +433,8 @@ do_main(){
     prepare_cmd
     do_action-cache
     echo "先运行docker以便异步准备网络"
-    run_zerotier_docker
+    # ali public ip , not need zerotier
+	#run_zerotier_docker
     # 失败不反馈到 github，否则会发邮件，挺烦的
     check_zerotier_connection || return 0
 
