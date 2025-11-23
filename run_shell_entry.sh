@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname $0)" || exit 1
 bashdir="$(pwd)"
-
+set -x 
 upload_dir="$bashdir/download_store/"
 keyfile="$bashdir/sync-passwd"
 
@@ -409,7 +409,7 @@ pull_db_and_check(){
             cp -f "/tmp/_db/db1.sqlite3" "/tmp/_db/db2.sqlite3"
             DB_FILE="/tmp/_db/db2.sqlite3"
         else
-            echo usb db2
+            echo use db2
             cp -f "/tmp/_db/db2.sqlite3" "/tmp/_db/db1.sqlite3"
             DB_FILE="/tmp/_db/db1.sqlite3"
         fi
