@@ -67,13 +67,17 @@ update_file_rsync_to_pc(){
 
 # 通用github下载模板
 # bitwarden 文件名不包含版本号，增加 add_tag 标记，来追加版本号
+# {"soft_dir_name": "trzsz","soft_repo": "trzsz/trzsz-go","soft_filter": "disable-win.*x86"},
+# {"soft_dir_name": "trzsz","soft_repo": "trzsz/trzsz-go","soft_filter": "disable-linux.*x86"},
+
+# {"soft_dir_name": "trzsz-ssh","soft_repo": "trzsz/trzsz-ssh","soft_filter": "disable-win.*x86"},
+# {"soft_dir_name": "trzsz-ssh","soft_repo": "trzsz/trzsz-ssh","soft_filter": "disable-linux.*x86"},
+# {"soft_dir_name": "Win32-OpenSSH","soft_repo": "PowerShell/Win32-OpenSSH","soft_filter": "Win64", "add_tag": true },
+# {"soft_dir_name": "v2rayN","soft_repo": "2dust/v2rayN","soft_filter": "^(?=.*windows)(?=.*desktop)(?!.*arm).+", "add_tag": true },
+# {"soft_dir_name": "my-win-openssh","soft_repo": "tick-guo/openssh-portable","soft_filter": ""},
 soft_json_config='
 [
-{"soft_dir_name": "trzsz","soft_repo": "trzsz/trzsz-go","soft_filter": "disable-win.*x86"},
-{"soft_dir_name": "trzsz","soft_repo": "trzsz/trzsz-go","soft_filter": "disable-linux.*x86"},
 
-{"soft_dir_name": "trzsz-ssh","soft_repo": "trzsz/trzsz-ssh","soft_filter": "disable-win.*x86"},
-{"soft_dir_name": "trzsz-ssh","soft_repo": "trzsz/trzsz-ssh","soft_filter": "disable-linux.*x86"},
 
 {"soft_dir_name": "legado","soft_repo": "gedoor/legado","soft_filter": ""},
 {"soft_dir_name": "notepadpp","soft_repo": "notepad-plus-plus/notepad-plus-plus","soft_filter": "x64.exe"},
@@ -81,9 +85,7 @@ soft_json_config='
 {"soft_dir_name": "ImageGlass","soft_repo": "d2phap/ImageGlass","soft_filter": "x64"},
 {"soft_dir_name": "bitwarden","soft_repo": "bitwarden/android","soft_filter": "bitwarden.apk", "add_tag": true },
 {"soft_dir_name": "LibChecker","soft_repo": "LibChecker/LibChecker","soft_filter": "apk"},
-{"soft_dir_name": "Win32-OpenSSH","soft_repo": "PowerShell/Win32-OpenSSH","soft_filter": "Win64", "add_tag": true },
-{"soft_dir_name": "v2rayN","soft_repo": "2dust/v2rayN","soft_filter": "^(?=.*windows)(?=.*desktop)(?!.*arm).+", "add_tag": true },
-{"soft_dir_name": "my-win-openssh","soft_repo": "tick-guo/openssh-portable","soft_filter": ""},
+
 {}
 ]
 '
