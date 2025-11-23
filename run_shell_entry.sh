@@ -177,7 +177,7 @@ update_github_soft(){
         the_dir="$upload_dir/${soft_dir_name}"
         mkdir -p "$the_dir"
 
-        curl -s https://api.github.com/repos/${soft_repo}/releases?per_page=1 > 1.log
+        curl -s https://api.github.com/repos/${soft_repo}/releases?per_page=2 > 1.log
         len=$(jq '.[0].assets' 1.log | jq 'length')
         for i in $(seq 0 $len)
         do
