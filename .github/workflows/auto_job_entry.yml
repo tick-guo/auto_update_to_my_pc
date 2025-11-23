@@ -68,7 +68,7 @@ jobs:
           ZEROTIER_IDENTITY_SECRET: ${{ secrets.ZEROTIER_IDENTITY_SECRET }}
           #notepad
           #PC_USER: ${{ secrets.PC_USER }}
-          PC_IP: '192.168.168.2'
+          PC_IP: ${{ secrets.ENV_IP_ALI }}
           #PC_KEY: ${{ secrets.PC_KEY }}
         run: |
           echo "--------------start"
