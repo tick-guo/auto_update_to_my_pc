@@ -403,6 +403,13 @@ pull_db_and_check(){
         echo "db1 db2 both ok, to select big version id"
         id1=$(db_get_max_id "/tmp/_db/db1.sqlite3")
         id2=$(db_get_max_id "/tmp/_db/db2.sqlite3")
+		if [ "$id1" == "" ];then 
+			id1=0
+		fi
+		if [ "$id2" == "" ];then 
+			id2=0
+		fi
+		
         echo id1=$id1,id2=$id2
         if [ "$id1" -gt "$id2" ];then
             echo use db1
