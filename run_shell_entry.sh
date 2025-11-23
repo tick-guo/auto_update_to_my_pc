@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname $0)" || exit 1
 bashdir="$(pwd)"
-set -x 
+#set -x 
 upload_dir="$bashdir/download_store/"
 keyfile="$bashdir/sync-passwd"
 
