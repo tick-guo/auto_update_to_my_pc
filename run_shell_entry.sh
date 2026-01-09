@@ -435,6 +435,26 @@ push_db_and_check(){
 
 }
 
+download_other_file_devstack(){
+    #
+    echo "下载其他文件"
+    #upload_dir="$bashdir/download_store/"
+    cd $upload_dir || exit 1
+    mkdir devstack
+    cd devstack
+    git clone https://opendev.org/openstack/devstack
+    if [ $? -eq 0 ];then
+        echo "devstack clone ok"
+    else
+        echo "devstack clone error"
+        return 1
+    fi
+    tar -cvzf devstack.tar.gz devstack
+    rm -rf devstack
+    ls -lh
+    return 0
+}
+
 do_main(){
     echo "准备命令环境"
     prepare_cmd
@@ -455,6 +475,8 @@ do_main(){
     #
     echo "列举文件"
     find "$upload_dir"
+    # 下载其他文件
+    download_other_file_devstack
     #
     echo "发送文件到PC"
     update_file_rsync_to_pc
